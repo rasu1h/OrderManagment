@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: test-module
+  datasource:
+    url: jdbc:postgresql://localhost:5432/test-module
+    username: ${DATABASE_USERNAME:postgres}
+    password: ${DATABASE_PASSWORD:13502}
+  jpa:
+    hibernate:
+      ddl-auto: update
