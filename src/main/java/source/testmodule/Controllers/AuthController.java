@@ -25,6 +25,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/auth")
+@Schema(description = "Auth Controller")
 public class AuthController extends BaseController {
 
     private final AuthenticationService authService;
