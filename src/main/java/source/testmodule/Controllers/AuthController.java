@@ -49,7 +49,7 @@ public class AuthController {
             @ApiResponse(responseCode = "400", description = "Неверные учетные данные")
     })
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody @Valid AuthRequest request, @CurrentUser User currentUser) {
+    public ResponseEntity<?> login(@RequestBody @Valid AuthRequest request) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(),
@@ -64,7 +64,7 @@ public class AuthController {
 
 
         String jwt = jwtTokenProvider.generateToken((UserDetails) authentication.getPrincipal());
-        log.info("User {} signed in", currentUser.getId());
+        log.info("User {} signed in", ((UserDetails) authentication.getPrincipal()));
         return ResponseEntity.ok(new AuthResponse("Signed in completed succesfully", jwt));
     }
 
