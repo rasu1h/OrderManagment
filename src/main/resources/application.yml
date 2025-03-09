@@ -8,4 +8,12 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-
+  cache:
+    type: caffeine
+    caffeine:
+      spec: maximumSize=500,expireAfterAccess=30m
+hibernate:
+  cache:
+   use_second_level_cache: true
+   region:
+    factory_class: org.hibernate.cache.ehcache.EhCacheRegionFactory

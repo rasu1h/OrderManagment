@@ -5,18 +5,16 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import source.testmodule.Configurations.Security.CurrentUser;
-import source.testmodule.DTO.OrderDTO;
-import source.testmodule.DTO.Requests.OrderRequest;
-import source.testmodule.DataBase.Entity.User;
-import source.testmodule.Services.OrderService;
+import org.springframework.web.bind.annotation.*;
+import source.testmodule.Infrastructure.Configurations.Security.CurrentUser;
+import source.testmodule.Presentation.DTO.OrderDTO;
+import source.testmodule.Presentation.DTO.Requests.OrderRequest;
+import source.testmodule.Domain.Entity.User;
+import source.testmodule.Application.Services.OrderService;
 
 @Slf4j
 @RestController
@@ -38,5 +36,14 @@ public class OrderController{
         log.info("Creating a new order");
         OrderDTO orderDTO = orderService.createOrder(orderRequest, currentUser);
         return ResponseEntity.ok(orderDTO);
+    }
+
+    @PutMapping("/{orderId}")
+    @Operation(summary = "Update order")
+    public ResponseEntity<OrderDTO> updateOrder(
+            @PathVariable Long orderId,
+            @RequestBody @Valid OrderRequest request
+    ) {
+        return ResponseEntity.ok(orderService.updateOrder(orderId, request));
     }
 }

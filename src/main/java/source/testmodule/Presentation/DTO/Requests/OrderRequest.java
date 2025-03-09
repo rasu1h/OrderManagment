@@ -1,9 +1,10 @@
-package source.testmodule.DTO.Requests;
+package source.testmodule.Presentation.DTO.Requests;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import source.testmodule.Domain.Enums.OrderStatus;
 
 @Data
 @AllArgsConstructor
@@ -11,6 +12,7 @@ import lombok.NoArgsConstructor;
 @Schema(description = "Запрос на создание заказа")
 public class OrderRequest {
     private String description;
+    private OrderStatus status;
     private Integer quantity;
     private Long productId;
 }

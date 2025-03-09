@@ -1,4 +1,4 @@
-package source.testmodule.Configurations.Security;
+package source.testmodule.Infrastructure.Configurations.Security;
 
 import java.lang.annotation.*;
 

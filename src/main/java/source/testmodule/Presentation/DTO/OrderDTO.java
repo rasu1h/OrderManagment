@@ -1,17 +1,11 @@
-package source.testmodule.DTO;
+package source.testmodule.Presentation.DTO;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import source.testmodule.DataBase.Entity.Order;
-import source.testmodule.DataBase.Entity.Product;
-import source.testmodule.DataBase.Entity.User;
-
-import java.util.List;
+import source.testmodule.Domain.Entity.Order;
+import source.testmodule.Domain.Enums.OrderStatus;
 
 @Data
 @AllArgsConstructor
@@ -22,6 +16,7 @@ public class OrderDTO {
     private String description;
     private Double price;
     private Integer quantity;
+    private OrderStatus status;
     private Long users;
     private Long products;
 
@@ -30,6 +25,7 @@ public class OrderDTO {
         orderDTO.setId(order.getId());
         orderDTO.setDescription(order.getDescription());
         orderDTO.setPrice(order.getPrice());
+        orderDTO.setStatus(order.getStatus());
         orderDTO.setQuantity(order.getQuantity());
         orderDTO.setUsers(order.getUser().getId());
         orderDTO.setProducts(order.getProduct().getId());
