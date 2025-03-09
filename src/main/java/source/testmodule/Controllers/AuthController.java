@@ -1,5 +1,10 @@
 package source.testmodule.Controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +37,15 @@ public class AuthController extends BaseController {
      * @return message and jwt token for the user
      */
 
+    @Operation(
+            summary = "Авторизация пользователя",
+            description = "Возвращает JWT токен для аутентифицированного пользователя"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Успешная авторизация",
+                    content = @Content(schema = @Schema(implementation = AuthResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Неверные учетные данные")
+    })
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid AuthRequest request) {
         Authentication authentication = authenticationManager.authenticate(
@@ -57,6 +71,16 @@ public class AuthController extends BaseController {
      * @param request
      * @return message and jwt token for the user
      */
+
+    @Operation(
+            summary = "Регистрация нового пользователя",
+            description = "Создает нового пользователя и возвращает JWT токен"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Успешная регистрация",
+                    content = @Content(schema = @Schema(implementation = AuthResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Ошибка валидации или email занят")
+    })
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody @Valid SignUpRequest request) {
         return ResponseEntity.ok(authService.authenticate(request));
