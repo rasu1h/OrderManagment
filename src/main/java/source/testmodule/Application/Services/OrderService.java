@@ -1,6 +1,8 @@
 package source.testmodule.Application.Services;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import source.testmodule.Domain.Enums.OrderStatus;
 import source.testmodule.Presentation.DTO.OrderDTO;
 import source.testmodule.Presentation.DTO.Requests.OrderRequest;
 import source.testmodule.Domain.Entity.User;
@@ -13,4 +15,8 @@ public interface OrderService {
     OrderDTO updateOrder(Long orderId, @Valid OrderRequest request);
 
     OrderDTO getOrderById(Long orderId);
+
+    List<OrderDTO> getFilteredOrders(OrderStatus status, Double minPrice, Double maxPrice);
+
+    void validatePriceRange(@Min(0) Double minPrice, @Min(0) Double maxPrice);
 }

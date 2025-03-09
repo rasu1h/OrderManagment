@@ -20,6 +20,10 @@ public class OrderDTO {
     private Long users;
     private Long products;
 
+    public OrderDTO(String invalidPriceRange) {
+        description = invalidPriceRange;
+    }
+
     public static OrderDTO fromEntity(Order order) {  // converting from entity to DTO response
         OrderDTO orderDTO = new OrderDTO();
         orderDTO.setId(order.getId());

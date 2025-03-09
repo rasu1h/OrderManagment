@@ -32,24 +32,33 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
+        return http
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())) //cors configuration
-                .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS)) //stateless session
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/orders/users/**").hasAuthority("ROLE_USER") //constraints for user
-                        .requestMatchers("/products/**").hasAuthority("ROLE_USER") //constraints for user
-                        .requestMatchers("/auth/login", "/auth/register").permitAll()
-                        .requestMatchers("/orders/**").hasAuthority("ROLE_ADMIN") //permissions for admin
-                        .requestMatchers("/users/**").hasAuthority("ROLE_ADMIN") //permissions for admin
-                        .requestMatchers("/products/**").hasAuthority("ROLE_ADMIN") //permissions for admin
-                        .anyRequest().authenticated()
+                        // Публичные эндпоинты
+                        .requestMatchers("/auth/**").permitAll()
+
+                        // Пользовательские эндпоинты (доступны USER и ADMIN)
+                        .requestMatchers(
+                                "/orders/my/**",
+                                "/orders/create",
+                                "/orders/{id}/update"
+                        ).hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
+
+                        // Админские эндпоинты
+                        .requestMatchers(
+                                "/orders/**",
+                                "/users/**",
+                                "/products/**"
+                        ).hasAuthority("ROLE_ADMIN")
+
+                        // Все остальные запросы требуют прав администратора
+                        .anyRequest().hasAuthority("ROLE_ADMIN")
                 )
-                .headers(AbstractHttpConfigurer::disable)
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class); // add jwt filter
-
-
-        return http.build();
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .build();
     }
 
     @Bean

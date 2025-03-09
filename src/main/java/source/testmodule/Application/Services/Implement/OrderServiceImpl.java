@@ -1,11 +1,16 @@
 package source.testmodule.Application.Services.Implement;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
+import source.testmodule.Domain.Enums.OrderStatus;
 import source.testmodule.Presentation.DTO.OrderDTO;
 import source.testmodule.Presentation.DTO.Requests.OrderRequest;
 import source.testmodule.Domain.Entity.Order;
@@ -19,13 +24,19 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@CacheConfig(cacheNames = "ordersCache")
 public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
+    private final CacheManager cacheManager;
 
     @Override
     @Transactional
-    @CacheEvict(value = {"orders", "userOrders"}, allEntries = true)
+    @Caching(evict = {
+            @CacheEvict(key = "'user_' + #currentUser.id"),
+            @CacheEvict(key = "'filtered'"),
+            @CacheEvict(key = "#result.id", condition = "#result != null")
+    })
     public OrderDTO createOrder(OrderRequest orderRequest, User currentUser) {
         Order order = new Order();
         Product product = productRepository.findById(orderRequest.getProductId()).orElseThrow(() -> new RuntimeException("Product not found"));
@@ -48,7 +59,7 @@ public class OrderServiceImpl implements OrderService {
 
 
 
-    @CacheEvict(value = {"orders", "userOrders"}, key = "#orderId")
+    @CacheEvict(value = {"userOrders"}, key = "#orderId")
     public OrderDTO updateOrder(Long orderId, OrderRequest request) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new EntityNotFoundException("Order not found"));
@@ -60,13 +71,32 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @Cacheable(value = {"orders", "userOrders"}, key = "#orderId")
+    @Cacheable(key = "#orderId")
     public OrderDTO getOrderById(Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new EntityNotFoundException("Order not found"));
         return OrderDTO.fromEntity(order);
     }
 
+    @Cacheable(key = "'filtered' + T(java.util.Objects).hash(#status, #minPrice, #maxPrice)")
+    public List<OrderDTO> getFilteredOrders(
+            @Nullable OrderStatus status,
+            @Nullable Double minPrice,
+            @Nullable Double maxPrice
+    ) {
+        validatePriceRange(minPrice, maxPrice);
+        return orderRepository.findFilteredOrders(status, minPrice, maxPrice)
+                .stream()
+                .map(OrderDTO::fromEntity)
+                .toList();
+    }
+
+    public void validatePriceRange(Double min, Double max) {
+        if (min != null && max != null && min > max) {
+            throw new IllegalArgumentException("Invalid price range");
+        }
+        ;
+    }
 
 
 }
