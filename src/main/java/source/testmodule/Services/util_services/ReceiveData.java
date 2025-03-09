@@ -14,7 +14,7 @@ import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
-public class ReceiveData {
+public class ReceiveData { /// to fasilitate extract the data from token
     private final JwtTokenProvider receiveToken;
     private final JwtAuthFilter jwtAuthFilter;
 
@@ -27,6 +27,10 @@ public class ReceiveData {
         return receiveToken.getUserDataFromToken(token);
     }
 
+    /**
+     * Get current http request
+     * @return HttpServletRequest object
+     */
     private HttpServletRequest getCurrentHttpRequest() {
         return ((ServletRequestAttributes) Objects
                 .requireNonNull(RequestContextHolder.getRequestAttributes()))

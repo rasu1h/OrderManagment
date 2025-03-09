@@ -18,6 +18,13 @@ import java.util.List;
 public class UserServiceImpl implements UserService, UserDetailsService {
     private final UserRepository userRepository;
 
+    /**
+     * Load user by username
+     * for authentication and authorization
+     * @param username username
+     * @return UserDetails
+     * @throws UsernameNotFoundException if user not found
+     */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(username)
@@ -30,7 +37,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                 authorities
         );
     }
-
+    // Get user by id
     @Override
     public User getUserById(Long userId) {
         return userRepository.findById(userId)

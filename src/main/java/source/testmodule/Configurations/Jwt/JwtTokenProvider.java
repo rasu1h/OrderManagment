@@ -17,6 +17,12 @@ import java.util.Map;
 public class JwtTokenProvider {
 
 
+    /**
+     * Генерация токена
+     *
+     * @param userDetails данные пользователя
+     * @return функция генерации токена
+     */
 
     public String generateToken(UserDetails userDetails) {
 
@@ -27,7 +33,12 @@ public class JwtTokenProvider {
         }
         return generateToken(claims,userDetails);
     }
-    
+    /***
+     * Генерация токена
+     * @param extraClaims  дополнительные данные для токена
+     * @param userDetails данные пользователя
+     * @return токен
+     */
     private String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
         final Integer  jwtExpirationMs = 86400000; // 24 часа
         return Jwts.builder()
@@ -57,6 +68,11 @@ public class JwtTokenProvider {
                 .getBody();
     }
 
+    /**
+     * Валидация данных пользователя из токена
+     * @param token
+     * @return
+     */
 
     public boolean validateToken(String token) {
         try {

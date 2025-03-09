@@ -26,6 +26,11 @@ public class AuthController extends BaseController {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
 
+    /**
+     * Login endpoint
+     * @param request
+     * @return message and jwt token for the user
+     */
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid AuthRequest request) {
@@ -35,6 +40,9 @@ public class AuthController extends BaseController {
                         request.getPassword()
                 )
         );
+        if (authentication == null) {
+            return ResponseEntity.badRequest().body("Invalid email or password");
+        }
 
         log.info("User {} signed in", request.getEmail());
 
@@ -44,6 +52,11 @@ public class AuthController extends BaseController {
         return ResponseEntity.ok(new AuthResponse("Signed in completed succesfully", jwt));
     }
 
+    /**
+     * Register endpoint
+     * @param request
+     * @return message and jwt token for the user
+     */
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody @Valid SignUpRequest request) {
         return ResponseEntity.ok(authService.authenticate(request));
