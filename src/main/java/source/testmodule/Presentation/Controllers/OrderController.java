@@ -40,10 +40,29 @@ public class OrderController{
 
     @PutMapping("/{orderId}")
     @Operation(summary = "Update order")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Order updated successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = OrderDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid input")
+    })
     public ResponseEntity<OrderDTO> updateOrder(
             @PathVariable Long orderId,
             @RequestBody @Valid OrderRequest request
     ) {
         return ResponseEntity.ok(orderService.updateOrder(orderId, request));
     }
+
+    @GetMapping("/{orderId}")
+    @Operation(summary = "Get order by Id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Order got successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = OrderDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid input")
+    })
+    public ResponseEntity<OrderDTO> getOrderById(
+            @PathVariable Long orderId
+    ) {
+        return ResponseEntity.ok(orderService.getOrderById(orderId));
+    }
+
+
+
 }

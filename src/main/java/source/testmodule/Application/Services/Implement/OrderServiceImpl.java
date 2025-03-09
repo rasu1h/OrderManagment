@@ -59,9 +59,13 @@ public class OrderServiceImpl implements OrderService {
         return OrderDTO.fromEntity(orderRepository.save(order));
     }
 
-
-
-
+    @Override
+    @Cacheable(value = {"orders", "userOrders"}, key = "#orderId")
+    public OrderDTO getOrderById(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new EntityNotFoundException("Order not found"));
+        return OrderDTO.fromEntity(order);
+    }
 
 
 

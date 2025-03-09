@@ -13,5 +13,5 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findByUserId(Long userId);
     List<Order> findByPriceLessThanEqualAndPriceGreaterThanEqual(Double min, Double max); // min <= price <= max
     List<Order> findByPriceLessThanEqual(Double max);                                     // price <= max
-    List<Order> findByPriceGreaterThanEqual(Double min);
+    List<Order> findByPriceGreaterThanEqual(Double min);                                  // price >= min
 }

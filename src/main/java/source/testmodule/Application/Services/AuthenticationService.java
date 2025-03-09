@@ -6,5 +6,4 @@ import source.testmodule.Presentation.DTO.Responses.AuthResponse;
 
 public interface AuthenticationService {
     AuthResponse authenticate(SignUpRequest authRequest);
-
 }
