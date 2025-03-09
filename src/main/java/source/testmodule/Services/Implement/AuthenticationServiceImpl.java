@@ -43,7 +43,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         user.setEmail(request.getEmail());
         user.setName(request.getUsername());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setRole(UserRole.USER);
+        user.setRole(UserRole.ROLE_USER);
         userRepository.save(user);
         log.info("User {} signed up successfully", user.getEmail());
         return new AuthResponse("User created successfully", jwtTokenProvider.generateToken(user));
