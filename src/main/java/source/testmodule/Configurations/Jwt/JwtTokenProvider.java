@@ -16,6 +16,8 @@ import java.util.Map;
 @Component
 public class JwtTokenProvider {
 
+
+
     public String generateToken(UserDetails userDetails) {
 
         Map<String,Object> claims = new HashMap<>();
@@ -48,13 +50,13 @@ public class JwtTokenProvider {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String getUsernameFromToken(String token) {
+    public  Map<String,Object> getUserDataFromToken(String token) {
         return Jwts.parser()
                 .setSigningKey(getSigningKey())
                 .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
+                .getBody();
     }
+
 
     public boolean validateToken(String token) {
         try {
