@@ -1,4 +1,4 @@
-package  source.testmodule.Configurations;
+package source.testmodule.Configurations.Security;
 
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;

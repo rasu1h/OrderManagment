@@ -12,6 +12,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import source.testmodule.Configurations.Jwt.JwtTokenProvider;
+import source.testmodule.Configurations.Security.CurrentUser;
 import source.testmodule.DTO.Requests.AuthRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +27,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 @RequiredArgsConstructor
 @RequestMapping("/auth")
 @Schema(description = "Auth Controller")
-public class AuthController extends BaseController {
+public class AuthController {
 
     private final AuthenticationService authService;
     private final AuthenticationManager authenticationManager;
@@ -48,7 +49,7 @@ public class AuthController extends BaseController {
             @ApiResponse(responseCode = "400", description = "Неверные учетные данные")
     })
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody @Valid AuthRequest request) {
+    public ResponseEntity<?> login(@RequestBody @Valid AuthRequest request, @CurrentUser User currentUser) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(),
@@ -63,7 +64,7 @@ public class AuthController extends BaseController {
 
 
         String jwt = jwtTokenProvider.generateToken((UserDetails) authentication.getPrincipal());
-        log.info("User {} signed in", data.get("id"));
+        log.info("User {} signed in", currentUser.getId());
         return ResponseEntity.ok(new AuthResponse("Signed in completed succesfully", jwt));
     }
 

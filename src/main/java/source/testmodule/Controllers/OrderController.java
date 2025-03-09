@@ -12,8 +12,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import source.testmodule.Configurations.Security.CurrentUser;
 import source.testmodule.DTO.OrderDTO;
 import source.testmodule.DTO.Requests.OrderRequest;
+import source.testmodule.DataBase.Entity.User;
 import source.testmodule.Services.OrderService;
 
 @Slf4j
@@ -21,7 +23,7 @@ import source.testmodule.Services.OrderService;
 @RequestMapping("/order")
 @RequiredArgsConstructor
 @Schema(description = "Order Controller")
-public class OrderController extends BaseController {
+public class OrderController{
     private final OrderService orderService;
 
     @PostMapping("/users/create")
@@ -30,9 +32,11 @@ public class OrderController extends BaseController {
             @ApiResponse(responseCode = "200", description = "Order created successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = OrderDTO.class))),
             @ApiResponse(responseCode = "400", description = "Invalid input")
     })
-    public ResponseEntity<OrderDTO> createOrder(@RequestBody OrderRequest orderRequest) {
+    public ResponseEntity<OrderDTO> createOrder(@RequestBody OrderRequest orderRequest
+                                              , @CurrentUser User currentUser
+    ) {
         log.info("Creating a new order");
-        OrderDTO orderDTO = orderService.createOrder(orderRequest, userId);
+        OrderDTO orderDTO = orderService.createOrder(orderRequest, currentUser);
         return ResponseEntity.ok(orderDTO);
     }
 }

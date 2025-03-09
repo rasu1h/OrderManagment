@@ -18,7 +18,7 @@ import source.testmodule.Services.ProductService;
 @RestController
 @RequiredArgsConstructor
 @Schema(description = "Product Controller")
-public class ProductController extends BaseController {
+public class ProductController {
     private final ProductService productService;
 
     @Operation(summary = "Adding a new product", description = "Adding a new Product for a Production")
