@@ -20,7 +20,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/auth")
-public class AuthController {
+public class AuthController extends BaseController {
 
     private final AuthenticationService authService;
     private final AuthenticationManager authenticationManager;
@@ -38,7 +38,9 @@ public class AuthController {
 
         log.info("User {} signed in", request.getEmail());
 
-        String jwt = jwtTokenProvider.generateToken((User) authentication.getPrincipal());
+
+        String jwt = jwtTokenProvider.generateToken((UserDetails) authentication.getPrincipal());
+        log.info("User {} signed in", data.get("id"));
         return ResponseEntity.ok(new AuthResponse("Signed in completed succesfully", jwt));
     }
 
