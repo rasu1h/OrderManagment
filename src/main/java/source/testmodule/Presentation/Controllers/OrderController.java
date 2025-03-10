@@ -105,7 +105,7 @@ public class OrderController {
      * @return the list of filtered orders
      */
     @GetMapping
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @Operation(summary = "Get filtered orders")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Orders found"),
@@ -136,7 +136,7 @@ public class OrderController {
             @ApiResponse(responseCode = "404", description = "Order not found", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "401", description = "Unauthorized - invalid/missing token", content = @Content(schema = @Schema(hidden = true)))
     })
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<Void> deleteOrder(@Parameter(description = "ID of order to delete", required = true, example = "123") @PathVariable Long orderId) {
         orderService.softDelete(orderId);
         return ResponseEntity.noContent().build();

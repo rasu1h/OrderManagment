@@ -3,6 +3,8 @@ package source.testmodule.Infrastructure.Configurations.Security;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -11,6 +13,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -57,28 +61,22 @@ public class SecurityConfig {
                         // Public authentication endpoints
                         .requestMatchers("/auth/**").permitAll()
 
-                        // User endpoints
-                        .requestMatchers(
-                                "/orders/my/**",
-                                "/orders/create",
-                                "/orders/my/create",
-                                "/orders/{id}/update"
-                        ).hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
+                                // Allow access to the registration endpoint
+                                .requestMatchers("/orders/my/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
 
-                        // Admin endpoints
-                        .requestMatchers(
-                                "/orders/**",
-                                "/users/**",
-                                "/products/**",
-                                "/metrics/**"
-                        ).hasAuthority("ROLE_ADMIN")
+                                      //  Allow access to the admin endpoints
+                                .requestMatchers(new NegatedRequestMatcher(new AntPathRequestMatcher("/orders/my/**")),
+                                        new AntPathRequestMatcher("/orders/**"))
+                                .hasAuthority("ROLE_ADMIN")
+                                .requestMatchers("/products/create").hasAuthority("ROLE_ADMIN")
 
-                        // All other requests require authentication
+                                // All other requests require authentication
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
+
 
     /**
      * Configures CORS settings.
