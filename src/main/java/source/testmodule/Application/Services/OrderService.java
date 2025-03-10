@@ -1,7 +1,6 @@
 package source.testmodule.Application.Services;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Min;
 import source.testmodule.Domain.Enums.OrderStatus;
 import source.testmodule.Presentation.DTO.OrderDTO;
 import source.testmodule.Presentation.DTO.Requests.OrderRequest;
@@ -12,11 +11,11 @@ import java.util.List;
 public interface OrderService {
     OrderDTO createOrder(OrderRequest orderRequest, User currentUser);
 
-    OrderDTO updateOrder(Long orderId, @Valid OrderRequest request);
+    OrderDTO updateOrder(Long orderId, @Valid OrderRequest request, User currentUser);
 
-    OrderDTO getOrderById(Long orderId);
+    OrderDTO getOrderById(Long orderId, User currentUser);
 
     List<OrderDTO> getFilteredOrders(OrderStatus status, Double minPrice, Double maxPrice);
 
-    void validatePriceRange(@Min(0) Double minPrice, @Min(0) Double maxPrice);
+    public void softDelete(Long orderId);
 }

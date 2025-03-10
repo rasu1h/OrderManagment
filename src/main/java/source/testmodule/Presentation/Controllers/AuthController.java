@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +25,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/auth")
-@Schema(description = "Auth Controller")
+@Tag(name = "auth", description = "Авторизация и регистрация пользователей")
 public class AuthController {
 
     private final AuthenticationService authService;

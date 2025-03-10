@@ -20,13 +20,11 @@ import java.util.List;
 
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
-
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 @AllArgsConstructor
 public class SecurityConfig {
-
 
     private final JwtAuthFilter jwtAuthFilter;
 
@@ -37,10 +35,19 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Публичные эндпоинты
+                        // Разрешить доступ к Swagger и OpenAPI
+                        .requestMatchers(
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/swagger-resources/**",
+                                "/webjars/**",
+                                "/favicon.ico"
+                        ).permitAll()
+
+                        // Публичные эндпоинты аутентификации
                         .requestMatchers("/auth/**").permitAll()
 
-                        // Пользовательские эндпоинты (доступны USER и ADMIN)
+                        // Пользовательские эндпоинты
                         .requestMatchers(
                                 "/orders/my/**",
                                 "/orders/create",
@@ -54,8 +61,8 @@ public class SecurityConfig {
                                 "/products/**"
                         ).hasAuthority("ROLE_ADMIN")
 
-                        // Все остальные запросы требуют прав администратора
-                        .anyRequest().hasAuthority("ROLE_ADMIN")
+                        // Все остальные запросы требуют аутентификации
+                        .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
@@ -65,20 +72,20 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of("*"));
-        configuration.setAllowedOriginPatterns(List.of("*"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setExposedHeaders(List.of("Authorization", "Content-Type"));
-        configuration.setAllowCredentials(true);
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
+        // Для production рекомендуется явно указать доверенные origin'ы
+        // configuration.setAllowedOrigins(List.of("https://trusted-domain.com"));
+
+        return new UrlBasedCorsConfigurationSource() {{
+            registerCorsConfiguration("/**", configuration);
+        }};
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config)
-            throws Exception {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 }

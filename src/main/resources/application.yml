@@ -17,3 +17,18 @@ hibernate:
    use_second_level_cache: true
    region:
     factory_class: org.hibernate.cache.ehcache.EhCacheRegionFactory
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui
+    enabled: true
+    tags-sorter: alpha
+    operations-sorter: alpha
+
+logging:
+  level:
+    org.springdoc: DEBUG
+    org.springframework.web.servlet: DEBUG
+
