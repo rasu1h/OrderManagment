@@ -179,7 +179,6 @@ public class OrderServiceImpl implements OrderService {
     public void softDelete(Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new EntityNotFoundException("Order not found"));
-        order.setDeleted(true);
-        orderRepository.save(order);
+        orderRepository.delete(order);
     }
 }
