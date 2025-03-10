@@ -9,81 +9,60 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
-import source.testmodule.Infrastructure.Configurations.Jwt.JwtTokenProvider;
-import source.testmodule.Presentation.DTO.Requests.AuthRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import source.testmodule.Presentation.DTO.Requests.AuthRequest;
 import source.testmodule.Presentation.DTO.Requests.SignUpRequest;
 import source.testmodule.Presentation.DTO.Responses.AuthResponse;
 import source.testmodule.Application.Services.AuthenticationService;
-import org.springframework.security.authentication.AuthenticationManager;
 
 @Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/auth")
-@Tag(name = "auth", description = "Авторизация и регистрация пользователей")
+@Tag(name = "auth", description = "User Authentication and Registration")
 public class AuthController {
 
     private final AuthenticationService authService;
-    private final AuthenticationManager authenticationManager;
-    private final JwtTokenProvider jwtTokenProvider;
 
     /**
-     * Login endpoint
-     * @param request
-     * @return message and jwt token for the user
+     * Login endpoint.
+     *
+     * @param request the authentication request containing user credentials
+     * @return a response with a message and JWT token for the authenticated user
      */
-
     @Operation(
-            summary = "Авторизация пользователя",
-            description = "Возвращает JWT токен для аутентифицированного пользователя"
+            summary = "User Login",
+            description = "Returns a JWT token for the authenticated user"
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Успешная авторизация",
+            @ApiResponse(responseCode = "200", description = "Successful authentication",
                     content = @Content(schema = @Schema(implementation = AuthResponse.class))),
-            @ApiResponse(responseCode = "400", description = "Неверные учетные данные")
+            @ApiResponse(responseCode = "400", description = "Invalid credentials")
     })
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid AuthRequest request) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
-                        request.getPassword()
-                )
-        );
-        if (authentication == null) {
-            return ResponseEntity.badRequest().body("Invalid email or password");
-        }
-
-        log.info("User {} signed in", request.getEmail());
-
-
-        String jwt = jwtTokenProvider.generateToken((UserDetails) authentication.getPrincipal());
-        log.info("User {} signed in", ((UserDetails) authentication.getPrincipal()));
-        return ResponseEntity.ok(new AuthResponse("Signed in completed succesfully", jwt));
+        return ResponseEntity.ok(authService.Authenticate(request));
     }
 
     /**
-     * Register endpoint
-     * @param request
-     * @return message and jwt token for the user
+     * Register endpoint.
+     *
+     * @param request the sign-up request containing user details
+     * @return a response with a message and JWT token for the newly registered user
      */
-
     @Operation(
-            summary = "Регистрация нового пользователя",
-            description = "Создает нового пользователя и возвращает JWT токен"
+            summary = "Register New User",
+            description = "Creates a new user and returns a JWT token"
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Успешная регистрация",
+            @ApiResponse(responseCode = "201", description = "User registered successfully",
                     content = @Content(schema = @Schema(implementation = AuthResponse.class))),
-            @ApiResponse(responseCode = "400", description = "Ошибка валидации или email занят")
+            @ApiResponse(responseCode = "400", description = "Validation error or email already exists")
     })
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody @Valid SignUpRequest request) {
-        return ResponseEntity.ok(authService.authenticate(request));
+    public ResponseEntity<AuthResponse> register(@RequestBody @Valid SignUpRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(authService.Register(request));
     }
 }

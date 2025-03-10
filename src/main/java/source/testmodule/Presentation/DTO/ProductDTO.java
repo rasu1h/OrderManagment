@@ -12,7 +12,7 @@ import source.testmodule.Domain.Entity.Product;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "DTO продукта")
+@Schema(description = "DTO response products")
 public class ProductDTO {
     private Long id;
     private String name;

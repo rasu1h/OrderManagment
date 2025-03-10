@@ -1,9 +1,11 @@
 package source.testmodule.Domain.Entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.checkerframework.common.aliasing.qual.Unique;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -26,6 +28,8 @@ public class User implements UserDetails {
     @Column( name = "user_id")
     private Long id;
     private String name;
+    @Email
+    @Unique
     private String email;
     private String password;
     @Enumerated(EnumType.STRING)
@@ -34,6 +38,12 @@ public class User implements UserDetails {
     public User(String mail, String password) {
         this.email = mail;
         this.password = password;
+    }
+
+    public User(String mail, String encodedPassword, List<GrantedAuthority> roleUser) {
+        this.email = mail;
+        this.password = encodedPassword;
+        this.role = UserRole.ROLE_USER;
     }
 
     @Override

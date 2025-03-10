@@ -1,0 +1,13 @@
+
+
+//    @Cacheable(value = "orders", key = "{#status, #minPrice, #maxPrice}")
+//    public List<OrderDTO> getFilteredOrders(String status, Double minPrice, Double maxPrice) {
+//        // Реализация фильтрации
+//    }
+
+    @Cacheable(value = "userOrders", key = "#userId")
+    public List<OrderDTO> getUserOrders(Long userId) {
+        return orderRepository.findByUserId(userId).stream()
+            .map(OrderDTO :: fromEntity)
+                .toList();
+    }

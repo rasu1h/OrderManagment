@@ -13,7 +13,7 @@ import source.testmodule.Domain.Enums.OrderStatus;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Schema(description = "DTO ответ заказа")
+@Schema(description = "DTO response for order")
 public class OrderDTO {
     private Long id;
     private String description;

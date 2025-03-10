@@ -12,7 +12,7 @@ import source.testmodule.Domain.Enums.OrderStatus;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Schema(description = "Запрос на создание заказа")
+@Schema(description = "Request body for order")
 public class OrderRequest {
     private String description;
     private OrderStatus status;

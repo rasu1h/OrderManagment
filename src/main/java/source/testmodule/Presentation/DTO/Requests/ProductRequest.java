@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "Запрос на создание продукта")
+@Schema(description = "Request body for product")
 public class ProductRequest {
     private String name;
     private Double price;

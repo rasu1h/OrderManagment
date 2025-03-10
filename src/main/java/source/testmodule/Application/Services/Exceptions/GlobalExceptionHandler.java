@@ -3,6 +3,7 @@ package source.testmodule.Application.Services.Exceptions;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.security.auth.message.AuthException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -25,7 +26,7 @@ public class GlobalExceptionHandler {
     ) {
         log.warn("Authorization denied: {}", ex.getMessage());
         return buildErrorResponse(
-                HttpStatus.FORBIDDEN, // Исправляем статус на 403
+                HttpStatus.FORBIDDEN, //403
                 "Access Denied",
                 ex.getMessage(),
                 request
@@ -39,22 +40,35 @@ public class GlobalExceptionHandler {
     })
     public ResponseEntity<ErrorResponse> handleAuthenticationExceptions(RuntimeException ex, WebRequest request) {
         log.warn(ERROR_LOG_TEMPLATE, ex.getClass().getSimpleName(), ex.getMessage());
-        return buildErrorResponse(HttpStatus.UNAUTHORIZED, "Authentication failed", ex.getMessage(), request);
+        return buildErrorResponse(HttpStatus.UNAUTHORIZED, //401
+                "Authentication failed", ex.getMessage(), request);
     }
 
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<ErrorResponse> handleIllegalStateException(IllegalStateException ex, WebRequest request) {
         log.warn(ERROR_LOG_TEMPLATE, ex.getClass().getSimpleName(), ex.getMessage());
-        return buildErrorResponse(HttpStatus.BAD_REQUEST, "Invalid request state", ex.getMessage(), request);
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, //400
+                "Invalid request state", ex.getMessage(), request);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleAllUncaughtExceptions(Exception ex, WebRequest request) {
         log.error("Unhandled exception occurred: {}", ex.getMessage(), ex);
         return buildErrorResponse(
-                HttpStatus.INTERNAL_SERVER_ERROR,
+                HttpStatus.INTERNAL_SERVER_ERROR, //500
                 "Internal server error",
                 "An unexpected error occurred",
+                request
+        );
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(DataIntegrityViolationException ex, WebRequest request) {
+        log.warn(ERROR_LOG_TEMPLATE, ex.getClass().getSimpleName(), ex.getMessage());
+        return buildErrorResponse(
+                HttpStatus.CONFLICT, //409
+                "Wrong data provided",
+                ex.getMessage(),
                 request
         );
     }

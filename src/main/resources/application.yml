@@ -32,6 +32,7 @@ logging:
     org.springdoc: DEBUG
     org.springframework.web.servlet: DEBUG
 
+
 management:
   endpoints:
     web:
@@ -42,3 +43,5 @@ management:
     metrics:
       access: unrestricted
 
+  logging.level.org.springframework.web=DEBUG
+  logging.level.org.springframework.web.servlet=DEBUG

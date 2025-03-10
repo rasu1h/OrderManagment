@@ -12,13 +12,13 @@ import java.io.Serializable;
  */
 
 @Data
-@Schema(description = "Запрос авторизации")
+@Schema(description = "Request body for authentication")
 @AllArgsConstructor
 public class AuthRequest {
-    @Schema(description = "Email пользователя", example = "user@example.com")
+    @Schema(description = "Email users", example = "user@example.com")
     @Email
     private String email;
 
-    @Schema(description = "Пароль", example = "mySecurePassword123")
+    @Schema(description = "Password", example = "mySecurePassword123")
     private String password;
 }
