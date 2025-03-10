@@ -58,7 +58,8 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/orders/**",
                                 "/users/**",
-                                "/products/**"
+                                "/products/**",
+                                "/metrics/**"
                         ).hasAuthority("ROLE_ADMIN")
 
                         // Все остальные запросы требуют аутентификации

@@ -32,3 +32,13 @@ logging:
     org.springdoc: DEBUG
     org.springframework.web.servlet: DEBUG
 
+management:
+  endpoints:
+    web:
+      base-path: /metrics   # По умолчанию /actuator
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    metrics:
+      access: unrestricted
+
