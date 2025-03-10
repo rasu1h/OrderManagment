@@ -26,11 +26,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public AuthResponse authenticate(SignUpRequest request) {
 
         if (userRepository.existsByEmail(request.getEmail())) {
-            return new AuthResponse("Email is busy.", null);
+            throw  new IllegalArgumentException("Email is busy.", null);
         }
 
         if (request.getPassword() == null || request.getPassword().isEmpty()) {
-            return new AuthResponse("Password is empty!", null);
+            throw  new IllegalArgumentException("Password is empty!", null);
         }
 
         return createUser(request);

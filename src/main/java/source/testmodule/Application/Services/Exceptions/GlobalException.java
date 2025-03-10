@@ -30,13 +30,19 @@ public class GlobalException {
         return new ResponseEntity<>(buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error", ex.getMessage(), request), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler(AuthException.class) // Add this method to handle AuthException
+    @ExceptionHandler(AuthException.class)        // Add this method to handle AuthException
     public ResponseEntity<Map<String, Object>> handleAuthException(AuthException e, WebRequest request) {
         return new ResponseEntity<>(buildResponse(HttpStatus.UNAUTHORIZED, "401 user not AUTHORIZED", e.getMessage(), request), HttpStatus.UNAUTHORIZED);
     }
+
     @ExceptionHandler(BadCredentialsException.class) // Add this method to handle BadCredentialsException
     public ResponseEntity<Map<String, Object>> handleBadCredentialsException(BadCredentialsException e, WebRequest request) {
         return new ResponseEntity<>(buildResponse(HttpStatus.UNAUTHORIZED, "401 user not AUTHORIZED", e.getMessage(), request), HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<Object> handleIllegalStateException(IllegalStateException ex, WebRequest request) {
+        return new ResponseEntity<>(buildResponse(HttpStatus.BAD_REQUEST, "Illegal State", ex.getMessage(), request), HttpStatus.BAD_REQUEST);
     }
 
 
