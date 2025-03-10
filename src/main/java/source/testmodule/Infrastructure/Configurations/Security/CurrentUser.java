@@ -6,4 +6,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface CurrentUser {
+    /**
+     * Annotation for getting the current user.
+     */
 }

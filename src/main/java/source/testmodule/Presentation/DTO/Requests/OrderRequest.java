@@ -6,6 +6,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import source.testmodule.Domain.Enums.OrderStatus;
 
+/**
+ * DTO class for the order request.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

@@ -4,6 +4,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+/**
+ * DTO class for the authentication response.
+ */
 @Data
 @Schema(description = "Ответ с JWT токеном")
 @AllArgsConstructor

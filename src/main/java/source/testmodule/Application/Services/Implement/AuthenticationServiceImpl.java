@@ -13,6 +13,10 @@ import source.testmodule.Domain.Enums.UserRole;
 import source.testmodule.Infrastructure.Repository.UserRepository;
 import source.testmodule.Application.Services.AuthenticationService;
 
+/**
+ * Implementation of the AuthenticationService interface.
+ * Provides methods for user authentication and registration.
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -21,21 +25,34 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
 
+    /**
+     * Authenticates a user based on the provided sign-up request.
+     *
+     * @param request the sign-up request containing user details
+     * @return the authentication response containing a success message and JWT token
+     * @throws IllegalArgumentException if the email is already in use or the password is empty
+     */
     @Override
     @Transactional
     public AuthResponse authenticate(SignUpRequest request) {
 
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw  new IllegalArgumentException("Email is busy.", null);
+            throw new IllegalArgumentException("Email is busy.", null);
         }
 
         if (request.getPassword() == null || request.getPassword().isEmpty()) {
-            throw  new IllegalArgumentException("Password is empty!", null);
+            throw new IllegalArgumentException("Password is empty!", null);
         }
 
         return createUser(request);
     }
 
+    /**
+     * Creates a new user based on the provided sign-up request.
+     *
+     * @param request the sign-up request containing user details
+     * @return the authentication response containing a success message and JWT token
+     */
     private AuthResponse createUser(SignUpRequest request) {
         User user = new User();
         user.setEmail(request.getEmail());

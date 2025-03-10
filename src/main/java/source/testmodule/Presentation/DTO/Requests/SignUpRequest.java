@@ -6,6 +6,9 @@ import lombok.Data;
 import jakarta.validation.constraints.Email;
 import lombok.NoArgsConstructor;
 
+/**
+ * DTO class for the authentication request.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

@@ -25,6 +25,10 @@ import javax.naming.NoPermissionException;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Implementation of the OrderService interface.
+ * Provides methods for managing orders.
+ */
 @Service
 @RequiredArgsConstructor
 @CacheConfig(cacheNames = "ordersCache")
@@ -33,12 +37,29 @@ public class OrderServiceImpl implements OrderService {
     private final ProductRepository productRepository;
     private final CacheManager cacheManager;
 
+    /**
+     * Checks if the order belongs to the current user.
+     *
+     * @param orderId the ID of the order
+     * @param currentUser the current user
+     * @return true if the order does not belong to the user, false otherwise
+     * @throws EntityNotFoundException if the order is not found
+     */
     boolean isUserOrder(Long orderId, User currentUser) {
         return orderRepository.findById(orderId)
                 .map(order -> !Objects.equals(order.getUser().getId(), currentUser.getId()))
                 .orElseThrow(() -> new EntityNotFoundException("Order not found"));
     }
 
+    /**
+     * Creates a new order.
+     *
+     * @param orderRequest the order request containing order details
+     * @param currentUser the current user making the request
+     * @return the created order
+     * @throws RuntimeException if the product is not found or there is not enough quantity
+     * @throws IllegalArgumentException if the quantity is less than or equal to 0 or the description is too long
+     */
     @Override
     @Transactional
     @Caching(evict = {
@@ -67,13 +88,19 @@ public class OrderServiceImpl implements OrderService {
 
         orderRepository.save(order);
         productRepository.save(product);
-        return  OrderDTO.fromEntity(order);
+        return OrderDTO.fromEntity(order);
     }
 
-
-
-
-
+    /**
+     * Updates an existing order.
+     *
+     * @param orderId the ID of the order to update
+     * @param request the order request containing updated order details
+     * @param currentUser the current user making the request
+     * @return the updated order
+     * @throws PermissionDeniedDataAccessException if the user does not have permission to update the order
+     * @throws EntityNotFoundException if the order is not found
+     */
     @CacheEvict(value = {"userOrders"}, key = "#orderId")
     public OrderDTO updateOrder(Long orderId, OrderRequest request, User currentUser) {
         if (isUserOrder(orderId, currentUser)) {
@@ -88,6 +115,15 @@ public class OrderServiceImpl implements OrderService {
         return OrderDTO.fromEntity(orderRepository.save(order));
     }
 
+    /**
+     * Retrieves an order by its ID.
+     *
+     * @param orderId the ID of the order to retrieve
+     * @param currentUser the current user making the request
+     * @return the retrieved order
+     * @throws PermissionDeniedDataAccessException if the user does not have permission to get the order
+     * @throws EntityNotFoundException if the order is not found
+     */
     @Override
     @Cacheable(key = "#orderId")
     public OrderDTO getOrderById(Long orderId, User currentUser) {
@@ -99,6 +135,14 @@ public class OrderServiceImpl implements OrderService {
         return OrderDTO.fromEntity(order);
     }
 
+    /**
+     * Retrieves a list of orders based on filters.
+     *
+     * @param status the status of the orders to filter by
+     * @param minPrice the minimum price of the orders to filter by
+     * @param maxPrice the maximum price of the orders to filter by
+     * @return the list of filtered orders
+     */
     @Cacheable(key = "'filtered' + T(java.util.Objects).hash(#status, #minPrice, #maxPrice)")
     public List<OrderDTO> getFilteredOrders(
             @Nullable OrderStatus status,
@@ -112,12 +156,25 @@ public class OrderServiceImpl implements OrderService {
                 .toList();
     }
 
+    /**
+     * Validates the price range.
+     *
+     * @param min the minimum price
+     * @param max the maximum price
+     * @throws IllegalArgumentException if the minimum price is greater than the maximum price
+     */
     public void validatePriceRange(Double min, Double max) {
         if (min != null && max != null && min > max) {
             throw new IllegalArgumentException("Invalid price range");
         }
-        ;
     }
+
+    /**
+     * Soft deletes an order by its ID.
+     *
+     * @param orderId the ID of the order to delete
+     * @throws EntityNotFoundException if the order is not found
+     */
     @CacheEvict(value = {"orders", "userOrders"}, key = "#orderId")
     public void softDelete(Long orderId) {
         Order order = orderRepository.findById(orderId)
@@ -125,6 +182,4 @@ public class OrderServiceImpl implements OrderService {
         order.setDeleted(true);
         orderRepository.save(order);
     }
-
-
 }

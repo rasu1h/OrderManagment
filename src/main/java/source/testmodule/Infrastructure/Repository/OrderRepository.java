@@ -12,7 +12,14 @@ import java.util.List;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
-
+    /**
+     * Find all orders by product and status.
+     * Filter by Price.
+     * @param status
+     * @param minPrice
+     * @param maxPrice
+     * @return
+     */
     @Query("""
         SELECT o FROM Order o\s
         WHERE (:status IS NULL OR o.status = :status)

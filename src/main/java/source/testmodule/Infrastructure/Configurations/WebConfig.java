@@ -14,35 +14,48 @@ import source.testmodule.Infrastructure.Repository.UserRepository;
 
 import java.util.List;
 
+/**
+ * Web configuration class for setting up custom argument resolvers, formatters, and resource handlers.
+ */
 @Configuration
 @RequiredArgsConstructor
-public class WebConfig  implements WebMvcConfigurer {
+public class WebConfig implements WebMvcConfigurer {
 
     private final UserRepository userRepository;
+
+    /**
+     * Adds custom argument resolvers to the list of resolvers.
+     *
+     * @param resolvers the list of argument resolvers to add to
+     */
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(new CurrentUserArgumentResolver(userRepository));
     }
+
+    /**
+     * Adds custom formatters to the registry.
+     *
+     * @param registry the formatter registry to add to
+     */
     @Override
     public void addFormatters(FormatterRegistry registry) {
         registry.addConverter(new StringToOrderStatusConverter());
     }
 
+    /**
+     * Converter class to convert String to OrderStatus enum.
+     */
     public static class StringToOrderStatusConverter implements Converter<String, OrderStatus> {
+        /**
+         * Converts a String to an OrderStatus enum.
+         *
+         * @param source the source string to convert
+         * @return the converted OrderStatus enum
+         */
         @Override
         public OrderStatus convert(String source) {
             return OrderStatus.valueOf(source.toUpperCase());
         }
     }
-    @Bean
-    public WebMvcConfigurer webMvcConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addResourceHandlers(ResourceHandlerRegistry registry) {
-                registry.addResourceHandler("/v3/api-docs/**")
-                        .addResourceLocations("classpath:/META-INF/resources/");
-//                registry.addResourceHandler("/swagger-ui/**")
-//                        .addResourceLocations("classpath:/META-INF/resources/webjars/springdoc-openapi-ui/");
-            }
-        };
-    }}
+}

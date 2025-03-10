@@ -32,7 +32,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                 user.getAuthorities()
         );
     }
-    // Get user by id
+
+    /**
+     * Get user by id
+     * @param userId
+     * @return
+     */
     @Override
     public User getUserById(Long userId) {
         return userRepository.findById(userId)

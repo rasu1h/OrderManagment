@@ -20,6 +20,9 @@ import java.util.List;
 
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
+/**
+ * Security configuration class for setting up Spring Security.
+ */
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -28,6 +31,13 @@ public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
 
+    /**
+     * Configures the security filter chain.
+     *
+     * @param http the HttpSecurity to modify
+     * @return the configured SecurityFilterChain
+     * @throws Exception if an error occurs while configuring the security filter chain
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
@@ -35,7 +45,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Разрешить доступ к Swagger и OpenAPI
+                        // Allow access to Swagger and OpenAPI
                         .requestMatchers(
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
@@ -44,17 +54,17 @@ public class SecurityConfig {
                                 "/favicon.ico"
                         ).permitAll()
 
-                        // Публичные эндпоинты аутентификации
+                        // Public authentication endpoints
                         .requestMatchers("/auth/**").permitAll()
 
-                        // Пользовательские эндпоинты
+                        // User endpoints
                         .requestMatchers(
                                 "/orders/my/**",
                                 "/orders/create",
                                 "/orders/{id}/update"
                         ).hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
 
-                        // Админские эндпоинты
+                        // Admin endpoints
                         .requestMatchers(
                                 "/orders/**",
                                 "/users/**",
@@ -62,13 +72,18 @@ public class SecurityConfig {
                                 "/metrics/**"
                         ).hasAuthority("ROLE_ADMIN")
 
-                        // Все остальные запросы требуют аутентификации
+                        // All other requests require authentication
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
+    /**
+     * Configures CORS settings.
+     *
+     * @return the configured CorsConfigurationSource
+     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
@@ -77,14 +92,18 @@ public class SecurityConfig {
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setExposedHeaders(List.of("Authorization", "Content-Type"));
 
-        // Для production рекомендуется явно указать доверенные origin'ы
-        // configuration.setAllowedOrigins(List.of("https://trusted-domain.com"));
-
         return new UrlBasedCorsConfigurationSource() {{
             registerCorsConfiguration("/**", configuration);
         }};
     }
 
+    /**
+     * Configures the authentication manager.
+     *
+     * @param config the AuthenticationConfiguration to use
+     * @return the configured AuthenticationManager
+     * @throws Exception if an error occurs while configuring the authentication manager
+     */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();

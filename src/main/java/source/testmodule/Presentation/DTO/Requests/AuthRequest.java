@@ -7,6 +7,10 @@ import lombok.Data;
 
 import java.io.Serializable;
 
+/**
+ * DTO class for the authentication request.
+ */
+
 @Data
 @Schema(description = "Запрос авторизации")
 @AllArgsConstructor

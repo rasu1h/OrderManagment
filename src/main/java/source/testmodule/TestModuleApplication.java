@@ -17,6 +17,10 @@ public class TestModuleApplication {
         SpringApplication.run(TestModuleApplication.class, args);
     }
 
+    /**
+     * Password encoder for Security
+     * @return
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

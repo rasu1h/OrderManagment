@@ -6,6 +6,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import source.testmodule.Domain.Entity.Product;
 
+/**
+ * DTO class for the product.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -16,6 +19,11 @@ public class ProductDTO {
     private Double price;
     private Integer quantity;
 
+    /**
+     * Converts the entity to the DTO.
+     * @param product
+     * @return
+     */
     public static ProductDTO fromEntity(Product product) {
         ProductDTO productDTO = new ProductDTO();
         productDTO.setId(product.getId());
