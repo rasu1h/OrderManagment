@@ -61,7 +61,6 @@ public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolve
         if (authentication == null || !authentication.isAuthenticated()) {
             throw new AccessDeniedException("User not authenticated");
         }
-
         String email = authentication.getName();
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));

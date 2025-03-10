@@ -61,6 +61,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/orders/my/**",
                                 "/orders/create",
+                                "/orders/my/create",
                                 "/orders/{id}/update"
                         ).hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
 
