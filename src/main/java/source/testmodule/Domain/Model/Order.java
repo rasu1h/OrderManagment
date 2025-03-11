@@ -2,11 +2,8 @@ package source.testmodule.Domain.Model;
 
 
 
-import io.swagger.v3.oas.annotations.Operation;
 import lombok.*;
 import source.testmodule.Domain.Enums.OrderStatus;
-import source.testmodule.Infrastructure.Persitence.Entity.ProductJpaEntity;
-import source.testmodule.Infrastructure.Persitence.Entity.UserJpaEntity;
 
 @Data
 @AllArgsConstructor

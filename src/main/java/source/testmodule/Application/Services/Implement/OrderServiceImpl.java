@@ -23,6 +23,7 @@ import source.testmodule.Presentation.DTO.OrderDTO;
 import source.testmodule.Presentation.DTO.Requests.OrderRequest;
 import source.testmodule.Domain.Enums.OrderStatus;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 
@@ -57,7 +58,7 @@ public class OrderServiceImpl implements OrderService {
                 .product(product)
                 .user(currentUser)
                 .status(OrderStatus.PENDING)
-                .price(product.getPrice() * request.getQuantity())
+                .price(product.getPrice().multiply(BigDecimal.valueOf(request.getQuantity())).doubleValue())
                 .build();
 
         Order savedOrder = orderRepository.save(newOrder);
@@ -87,7 +88,7 @@ public class OrderServiceImpl implements OrderService {
         order.setQuantity(request.getQuantity());
         order.setDescription(request.getDescription());
         order.setStatus(request.getStatus());
-        order.setPrice(order.getProduct().getPrice() * request.getQuantity());
+        order.setPrice(order.getProduct().getPrice().multiply(BigDecimal.valueOf(request.getQuantity())).doubleValue());
         orderRepository.save(order);
         return orderMapper.toDTO(order);
     }

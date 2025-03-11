@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 /**
  * DTO class for the product request.
  */
@@ -14,6 +16,6 @@ import lombok.NoArgsConstructor;
 @Schema(description = "Request body for product")
 public class ProductRequest {
     private String name;
-    private Double price;
+    private BigDecimal price;
     private Integer quantity;
 }

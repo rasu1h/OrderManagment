@@ -1,7 +1,9 @@
 package source.testmodule.Domain.Repository;
 
 import source.testmodule.Domain.Model.Product;
+import source.testmodule.Infrastructure.Persitence.Entity.ProductJpaEntity;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ProductRepositoryPort {
@@ -11,4 +13,6 @@ public interface ProductRepositoryPort {
     Optional <Product> findById(Long id);
 
     void save(Product product);
+
+    void saveAll(List<ProductJpaEntity> products);
 }

@@ -10,6 +10,7 @@ import source.testmodule.Infrastructure.Persitence.Entity.ProductJpaEntity;
 import source.testmodule.Infrastructure.Persitence.Mappers.ProductMapper;
 import source.testmodule.Infrastructure.Persitence.RepositoryAdapters.JpaRepository.JpaProductRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -45,6 +46,11 @@ public class ProductRepositoryAdapter implements ProductRepositoryPort{
     @Override
     public void save(Product product) {
         productRepository.save(productRepository.findById(product.getId()).get());
+    }
+
+    @Override
+    public void saveAll(List<ProductJpaEntity> products) {
+        productRepository.saveAll(products);
     }
 
 

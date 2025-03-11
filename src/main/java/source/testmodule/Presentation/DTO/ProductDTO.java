@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import source.testmodule.Infrastructure.Persitence.Entity.ProductJpaEntity;
 
+import java.math.BigDecimal;
+
 /**
  * DTO class for the product.
  */
@@ -16,7 +18,7 @@ import source.testmodule.Infrastructure.Persitence.Entity.ProductJpaEntity;
 public class ProductDTO {
     private Long id;
     private String name;
-    private Double price;
+    private BigDecimal price;
     private Integer quantity;
 
     /**

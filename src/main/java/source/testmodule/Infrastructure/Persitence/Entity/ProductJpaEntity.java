@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
+import java.math.BigDecimal;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -18,6 +20,12 @@ public class ProductJpaEntity {
     @GeneratedValue( strategy = GenerationType.IDENTITY )
     private Long id;
     private String name;
-    private Double price;
+    private BigDecimal price;
     private Integer quantity;
+
+    public ProductJpaEntity(String name, BigDecimal price, int i) {
+        this.name = name;
+        this.price = price;
+        this.quantity = i;
+    }
 }

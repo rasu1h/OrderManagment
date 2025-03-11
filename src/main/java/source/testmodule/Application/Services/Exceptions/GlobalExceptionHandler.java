@@ -1,6 +1,7 @@
 package source.testmodule.Application.Services.Exceptions;
 
 import io.jsonwebtoken.ExpiredJwtException;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.security.auth.message.AuthException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -32,6 +33,12 @@ public class GlobalExceptionHandler {
                 request
         );
     }
+    @ExceptionHandler({EntityNotFoundException.class})
+    public ResponseEntity<ErrorResponse> handleEntityNotFoundException(EntityNotFoundException ex, WebRequest request) {
+        log.warn(ERROR_LOG_TEMPLATE, ex.getClass().getSimpleName(), ex.getMessage());
+        return buildErrorResponse(HttpStatus.NOT_FOUND, //404
+                "Entity not found", ex.getMessage(), request);
+    }
 
     @ExceptionHandler({
             AuthException.class,
@@ -57,7 +64,7 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR, //500
                 "Internal server error",
-                "An unexpected error occurred",
+                ex.getMessage(),
                 request
         );
     }
