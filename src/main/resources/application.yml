@@ -43,5 +43,4 @@ management:
     metrics:
       access: unrestricted
 
-  logging.level.org.springframework.web=DEBUG
-  logging.level.org.springframework.web.servlet=DEBUG
+

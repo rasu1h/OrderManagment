@@ -5,14 +5,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import source.testmodule.Domain.Entity.User;
-import source.testmodule.Infrastructure.Repository.UserRepository;
+import source.testmodule.Infrastructure.Persitence.Entity.UserJpaEntity;
+import source.testmodule.Infrastructure.Persitence.RepositoryAdapters.JpaRepository.JpaUserRepository;
 import source.testmodule.Application.Services.UserService;
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService, UserDetailsService {
-    private final UserRepository userRepository;
+    private final JpaUserRepository jpaUserRepository;
 
     /**
      * Load user by username
@@ -23,13 +23,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(username)
+        UserJpaEntity userJpaEntity = jpaUserRepository.findByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + username));
 
         return new org.springframework.security.core.userdetails.User(
-                user.getEmail(),
-                user.getPassword(),
-                user.getAuthorities()
+                userJpaEntity.getEmail(),
+                userJpaEntity.getPassword(),
+                userJpaEntity.getAuthorities()
         );
     }
 
@@ -39,8 +39,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      * @return
      */
     @Override
-    public User getUserById(Long userId) {
-        return userRepository.findById(userId)
+    public UserJpaEntity getUserById(Long userId) {
+        return jpaUserRepository.findById(userId)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + userId));
     }
 }

@@ -1,16 +1,14 @@
 package source.testmodule.Infrastructure.Configurations;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import source.testmodule.Domain.Enums.OrderStatus;
+import source.testmodule.Domain.Repository.UserRepositoryPort;
 import source.testmodule.Infrastructure.Configurations.Security.CurrentUserArgumentResolver;
-import source.testmodule.Infrastructure.Repository.UserRepository;
 
 import java.util.List;
 
@@ -21,7 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
 
-    private final UserRepository userRepository;
+    private final UserRepositoryPort userRepositoryPort;
 
     /**
      * Adds custom argument resolvers to the list of resolvers.
@@ -30,7 +28,7 @@ public class WebConfig implements WebMvcConfigurer {
      */
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
-        resolvers.add(new CurrentUserArgumentResolver(userRepository));
+        resolvers.add(new CurrentUserArgumentResolver(userRepositoryPort));
     }
 
     /**

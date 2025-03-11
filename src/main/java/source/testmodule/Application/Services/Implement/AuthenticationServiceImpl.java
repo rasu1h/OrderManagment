@@ -4,7 +4,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -12,13 +11,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import source.testmodule.Domain.Repository.UserRepositoryPort;
+import source.testmodule.Infrastructure.Persitence.Entity.UserJpaEntity;
 import source.testmodule.Infrastructure.Configurations.Jwt.JwtTokenProvider;
 import source.testmodule.Presentation.DTO.Requests.AuthRequest;
 import source.testmodule.Presentation.DTO.Requests.SignUpRequest;
 import source.testmodule.Presentation.DTO.Responses.AuthResponse;
-import source.testmodule.Domain.Entity.User;
 import source.testmodule.Domain.Enums.UserRole;
-import source.testmodule.Infrastructure.Repository.UserRepository;
+import source.testmodule.Infrastructure.Persitence.RepositoryAdapters.JpaRepository.JpaUserRepository;
 import source.testmodule.Application.Services.AuthenticationService;
 
 /**
@@ -29,7 +29,7 @@ import source.testmodule.Application.Services.AuthenticationService;
 @Service
 @RequiredArgsConstructor
 public class AuthenticationServiceImpl implements AuthenticationService {
-    private final UserRepository userRepository;
+    private final UserRepositoryPort userRepositoryPort;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
@@ -46,7 +46,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Transactional
     public AuthResponse Register(SignUpRequest request) {
 
-        if (userRepository.existsByEmail(request.getEmail())) {
+        if (userRepositoryPort.existsByEmail(request.getEmail())) {
             throw new DataIntegrityViolationException("Email is already in use!");
         }
 
@@ -84,13 +84,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
      * @return the authentication response containing a success message and JWT token
      */
     private AuthResponse createUser(SignUpRequest request) {
-        User user = new User();
-        user.setEmail(request.getEmail());
-        user.setName(request.getUsername());
-        user.setPassword(passwordEncoder.encode(request.getPassword())); // encode the password for security
-        user.setRole(UserRole.ROLE_USER);
-        userRepository.save(user);
-        log.info("User {} signed up successfully", user.getEmail());
-        return new AuthResponse("User created successfully", jwtTokenProvider.generateToken(user));
+        UserJpaEntity userJpaEntity = new UserJpaEntity();
+        userJpaEntity.setEmail(request.getEmail());
+        userJpaEntity.setName(request.getUsername());
+        userJpaEntity.setPassword(passwordEncoder.encode(request.getPassword())); // encode the password for security
+        userJpaEntity.setRole(UserRole.ROLE_USER);
+        userRepositoryPort.save(userJpaEntity);
+        log.info("User {} signed up successfully", userJpaEntity.getEmail());
+        return new AuthResponse("User created successfully", jwtTokenProvider.generateToken(userJpaEntity));
     }
 }

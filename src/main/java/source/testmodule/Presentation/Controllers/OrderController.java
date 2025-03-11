@@ -18,11 +18,12 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.web.oauth2.client.OAuth2ClientSecurityMarker;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
+import source.testmodule.Domain.Model.User;
+import source.testmodule.Infrastructure.Persitence.Entity.UserJpaEntity;
 import source.testmodule.Domain.Enums.OrderStatus;
 import source.testmodule.Infrastructure.Configurations.Security.CurrentUser;
 import source.testmodule.Presentation.DTO.OrderDTO;
 import source.testmodule.Presentation.DTO.Requests.OrderRequest;
-import source.testmodule.Domain.Entity.User;
 import source.testmodule.Application.Services.OrderService;
 
 import java.util.List;

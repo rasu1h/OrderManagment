@@ -11,7 +11,15 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.dao.PermissionDeniedDataAccessException;
 import org.springframework.stereotype.Service;
-import source.testmodule.Domain.Enums.OrderStatus;
+import source.testmodule.Application.Services.OrderService;
+import source.testmodule.Domain.Model.Order;
+import source.testmodule.Domain.Model.Product;
+import source.testmodule.Domain.Model.User;
+import source.testmodule.Domain.Repository.OrderRepositoryPort;
+import source.testmodule.Domain.Repository.ProductRepositoryPort;
+import source.testmodule.Infrastructure.Persitence.Entity.OrderJpaEntity;
+import source.testmodule.Infrastructure.Persitence.Entity.UserJpaEntity;
+import source.testmodule.Infrastructure.Persitence.Mappers.OrderMapper;
 import source.testmodule.Presentation.DTO.OrderDTO;
 import source.testmodule.Presentation.DTO.Requests.OrderRequest;
 import source.testmodule.Domain.Entity.Order;
@@ -67,24 +75,11 @@ public class OrderServiceImpl implements OrderService {
             @CacheEvict(key = "'filtered'"),
             @CacheEvict(key = "#result.id", condition = "#result != null")
     })
-    public OrderDTO createOrder(OrderRequest orderRequest, User currentUser) {
-        Order order = new Order();
-        Product product = productRepository.findById(orderRequest.getProductId()).orElseThrow(() -> new RuntimeException("Product not found"));
-        if (product.getQuantity() < orderRequest.getQuantity()) {
-            throw new RuntimeException("Not enough quantity");
-        }
-        if (orderRequest.getQuantity() <= 0) {
-            throw new IllegalArgumentException("Quantity must be greater than 0");
-        }
-        if (orderRequest.getDescription().length() > 255) {
-            throw new IllegalArgumentException("Description is too long");
-        }
-        order.setDescription(orderRequest.getDescription());
-        order.setQuantity(orderRequest.getQuantity());
-        order.setPrice(product.getPrice() * orderRequest.getQuantity());
-        order.setProduct(product);
-        order.setUser(currentUser);
-        product.setQuantity(product.getQuantity() - orderRequest.getQuantity());
+    public OrderDTO createOrder(OrderRequest request, User currentUser) {
+        Product product = productRepository.findById(request.getProductId())
+                .orElseThrow(() -> new EntityNotFoundException(String.valueOf(request.getProductId()) + " of Product not found"));
+
+        validateOrderRequest(request, product);
 
         orderRepository.save(order);
         productRepository.save(product);
@@ -96,14 +91,14 @@ public class OrderServiceImpl implements OrderService {
      *
      * @param orderId the ID of the order to update
      * @param request the order request containing updated order details
-     * @param currentUser the current user making the request
+     * @param currentUserJpaEntity the current user making the request
      * @return the updated order
      * @throws PermissionDeniedDataAccessException if the user does not have permission to update the order
      * @throws EntityNotFoundException if the order is not found
      */
     @CacheEvict(value = {"userOrders"}, key = "#orderId")
-    public OrderDTO updateOrder(Long orderId, OrderRequest request, User currentUser) {
-        if (isUserOrder(orderId, currentUser)) {
+    public OrderDTO updateOrder(Long orderId, OrderRequest request, User currentUserJpaEntity) {
+        if (isUserOrder(orderId, currentUserJpaEntity)) {
             throw new PermissionDeniedDataAccessException("You don't have permission to update this order", null);
         }
         Order order = orderRepository.findById(orderId)
@@ -117,18 +112,15 @@ public class OrderServiceImpl implements OrderService {
 
     /**
      * Retrieves an order by its ID.
-     *
-     * @param orderId the ID of the order to retrieve
-     * @param currentUser the current user making the request
-     * @return the retrieved order
-     * @throws PermissionDeniedDataAccessException if the user does not have permission to get the order
-     * @throws EntityNotFoundException if the order is not found
+     * @param orderId
+     * @param currentUser
+     * @return
      */
     @Override
     @Cacheable(key = "#orderId")
     public OrderDTO getOrderById(Long orderId, User currentUser) {
-        if (isUserOrder(orderId, currentUser)) {
-            throw new PermissionDeniedDataAccessException("You don't have permission to get this order", null);
+        if (!isUserOrder(orderId,currentUser)) {
+            throw new PermissionDeniedDataAccessException("You don't have permission to update this order", null);
         }
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new EntityNotFoundException("Order not found"));
@@ -143,6 +135,7 @@ public class OrderServiceImpl implements OrderService {
      * @param maxPrice the maximum price of the orders to filter by
      * @return the list of filtered orders
      */
+    @Override
     @Cacheable(key = "'filtered' + T(java.util.Objects).hash(#status, #minPrice, #maxPrice)")
     public List<OrderDTO> getFilteredOrders(
             @Nullable OrderStatus status,

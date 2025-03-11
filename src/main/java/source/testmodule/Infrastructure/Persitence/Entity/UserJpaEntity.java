@@ -1,4 +1,4 @@
-package source.testmodule.Domain.Entity;
+package source.testmodule.Infrastructure.Persitence.Entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -22,7 +22,7 @@ import java.util.List;
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Table(name = "users")
-public class User implements UserDetails {
+public class UserJpaEntity implements UserDetails {
     @Id
     @GeneratedValue( strategy = GenerationType.IDENTITY )
     @Column( name = "user_id")
@@ -35,12 +35,12 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
-    public User(String mail, String password) {
+    public UserJpaEntity(String mail, String password) {
         this.email = mail;
         this.password = password;
     }
 
-    public User(String mail, String encodedPassword, List<GrantedAuthority> roleUser) {
+    public UserJpaEntity(String mail, String encodedPassword, List<GrantedAuthority> roleUser) {
         this.email = mail;
         this.password = encodedPassword;
         this.role = UserRole.ROLE_USER;

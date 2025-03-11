@@ -6,7 +6,8 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-import source.testmodule.Domain.Entity.User;
+import source.testmodule.Domain.Model.User;
+import source.testmodule.Infrastructure.Persitence.Entity.UserJpaEntity;
 
 import java.security.Key;
 import java.util.Date;
@@ -27,9 +28,9 @@ public class JwtTokenProvider {
     public String generateToken(UserDetails userDetails) {
 
         Map<String,Object> claims = new HashMap<>();
-        if (userDetails instanceof User customUserDetails){
-            claims.put("id",customUserDetails.getId());
-            claims.put("role",customUserDetails.getRole());
+        if (userDetails instanceof User customUserJpaEntityDetails){
+            claims.put("id", customUserJpaEntityDetails.getId());
+            claims.put("role", customUserJpaEntityDetails.getRole());
         }
         return generateToken(claims,userDetails);
     }

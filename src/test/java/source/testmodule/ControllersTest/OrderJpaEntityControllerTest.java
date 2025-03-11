@@ -73,12 +73,12 @@ public class OrderControllerTest {
     static class TestConfig {
         @Bean
         @Primary
-        public UserRepository userRepository() {
-            UserRepository mockRepo = Mockito.mock(UserRepository.class);
-            User testUser = new User();
-            testUser.setId(1L);
-            testUser.setEmail("user");
-            Mockito.when(mockRepo.findByEmail("user")).thenReturn(Optional.of(testUser));
+        public UserRepositoryPort userRepository() {
+            UserRepositoryPort mockRepo = Mockito.mock(UserRepositoryPort.class);
+            User userTest = new User();
+            userTest.setId(1L);
+            userTest.setEmail("user");
+            Mockito.when(mockRepo.findByEmail("user")).thenReturn(Optional.of(userTest));
             return mockRepo;
         }
     }

@@ -1,7 +1,7 @@
 package source.testmodule.Application.Services;
 
-import source.testmodule.Domain.Entity.User;
+import source.testmodule.Infrastructure.Persitence.Entity.UserJpaEntity;
 
 public interface UserService {
-    User getUserById(Long userId);
+    UserJpaEntity getUserById(Long userId);
 }

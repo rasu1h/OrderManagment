@@ -35,9 +35,9 @@ public class Order {
     private Integer quantity;
     private Boolean deleted = false; // Добавляем поле для мягкого удаления
     @NonNull
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
-    private User user;
+    private UserJpaEntity userJpaEntity;
     @NonNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
