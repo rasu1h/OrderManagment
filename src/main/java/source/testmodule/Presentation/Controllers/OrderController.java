@@ -17,6 +17,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
 import source.testmodule.Domain.Model.User;
+import source.testmodule.Infrastructure.Configurations.Logs.Loggable;
 import source.testmodule.Infrastructure.Persitence.Entity.UserJpaEntity;
 import source.testmodule.Domain.Enums.OrderStatus;
 import source.testmodule.Infrastructure.Configurations.Security.CurrentUser;
@@ -45,6 +46,7 @@ public class OrderController {
      * @return the created order
      */
     @PostMapping("/my/create")
+    @Loggable(action = "ORDER_CREATION")
     @Operation(summary = "Create a new order", description = "Creates a new order for a user")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "POST/ Order created successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = OrderDTO.class))),
@@ -66,6 +68,7 @@ public class OrderController {
      * @return the updated order
      */
     @PutMapping("/my/{orderId}")
+    @Loggable(action = "ORDER_UPDATE")
     @Operation(summary = "Update order")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "PUT/ Order updated successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = OrderDTO.class))),
@@ -85,6 +88,7 @@ public class OrderController {
      * @return the retrieved order
      */
     @GetMapping("my/{orderId}")
+    @Loggable(action = "ORDER_RETRIEVAL")
     @Operation(summary = "Get order by Id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "GET/ Order got successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = OrderDTO.class))),
@@ -104,6 +108,7 @@ public class OrderController {
      * @return the list of filtered orders
      */
     @GetMapping
+    @Loggable(action = "ORDER_FILTERING")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @Operation(summary = "Get filtered orders")
     @ApiResponses(value = {
@@ -128,6 +133,7 @@ public class OrderController {
      * @return a response entity with no content
      */
     @DeleteMapping("/{orderId}")
+    @Loggable(action = "ORDER_DELETION")
     @Operation(summary = "Delete order by ID", description = "Soft delete order (admin only)", security = @SecurityRequirement(name = "JWT"))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Order deleted successfully"),

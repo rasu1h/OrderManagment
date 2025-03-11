@@ -18,8 +18,6 @@ import source.testmodule.Domain.Model.Product;
 import source.testmodule.Domain.Model.User;
 import source.testmodule.Domain.Repository.OrderRepositoryPort;
 import source.testmodule.Domain.Repository.ProductRepositoryPort;
-import source.testmodule.Infrastructure.Persitence.Entity.OrderJpaEntity;
-import source.testmodule.Infrastructure.Persitence.Entity.UserJpaEntity;
 import source.testmodule.Infrastructure.Persitence.Mappers.OrderMapper;
 import source.testmodule.Presentation.DTO.OrderDTO;
 import source.testmodule.Presentation.DTO.Requests.OrderRequest;
@@ -179,7 +177,7 @@ public class OrderServiceImpl implements OrderService {
      */
     boolean isUserOrder(Long orderId, User currentUser) {
         Order jpaOrder = orderRepository.findById(orderId).orElseThrow();
-        log.debug("UserJpaEntity in OrderJpaEntity: {}", jpaOrder.getUser()); // Should not be null
+        log.debug("User in OrderJpaEntity: {}", jpaOrder.getUser().getName()); // Should not be null
         return orderRepository.findById(orderId)
                 .map(order -> !Objects.equals(order.getUser().getId(), currentUser.getId()))
                 .orElseThrow(() -> new EntityNotFoundException("Order not found"));

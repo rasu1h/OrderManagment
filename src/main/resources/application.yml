@@ -1,22 +1,27 @@
 spring:
   application:
     name: test-module
+  aop:
+    auto: true
+
   datasource:
     url: jdbc:postgresql://localhost:5432/test-module
     username: ${DATABASE_USERNAME:postgres}
     password: ${DATABASE_PASSWORD:13502}
   jpa:
+    open-in-view: false
     hibernate:
       ddl-auto: update
   cache:
     type: caffeine
     caffeine:
       spec: maximumSize=500,expireAfterAccess=30m
+
 hibernate:
   cache:
-   use_second_level_cache: true
-   region:
-    factory_class: org.hibernate.cache.ehcache.EhCacheRegionFactory
+    use_second_level_cache: true
+    region:
+      factory_class: org.hibernate.cache.jcache.JCacheRegionFactory
 
 springdoc:
   api-docs:
@@ -28,19 +33,29 @@ springdoc:
     operations-sorter: alpha
 
 logging:
+  file:
+    name: logs/application.log
+  pattern:
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
   level:
-    org.springdoc: DEBUG
-    org.springframework.web.servlet: DEBUG
-
+    root: INFO
+    org.springframework.web: info
+    org.hibernate.SQL: INFO
+    source.testmodule: TRACE
+    source:
+      testmodule:
+        Infrastructure:
+          Configurations:
+            Logs: DEBUG
 
 management:
   endpoints:
     web:
-      base-path: /metrics   # По умолчанию /actuator
+      base-path: /actuator
       exposure:
-        include: health,info,metrics
+        include: health,info
   endpoint:
+    health:
+      show-details: always
     metrics:
-      access: unrestricted
-
-
+      enabled: false

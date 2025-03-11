@@ -53,7 +53,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         if (request.getPassword() == null || request.getPassword().isEmpty()) {
             throw new IllegalArgumentException("Password is empty!", null);
         }
-
+        log.debug("User {} signed up successfully", request.getEmail());
         return createUser(request);
     }
 
@@ -69,11 +69,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             return ResponseEntity.badRequest().body(new AuthResponse("Invalid email or password", null)).getBody();
         }
 
-        log.info("User {} signed in", request.getEmail());
+        log.debug("User {} signed in", request.getEmail());
 
 
         String jwt = jwtTokenProvider.generateToken((UserDetails) authentication.getPrincipal());
-        log.info("User {} signed in", ((UserDetails) authentication.getPrincipal()));
+        log.debug("User {} | SIGNED IN ", ((UserDetails) authentication.getPrincipal()));
         return new AuthResponse("User signed in successfully", jwt);
     }
 
