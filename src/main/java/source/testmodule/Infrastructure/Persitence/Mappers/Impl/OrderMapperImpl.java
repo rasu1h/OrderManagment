@@ -45,6 +45,7 @@ public class OrderMapperImpl implements OrderMapper {
         orderDTO.setDescription(domain.getDescription());
         orderDTO.setQuantity(domain.getQuantity());
         orderDTO.setStatus(domain.getStatus());
+        orderDTO.setPrice(domain.getPrice());
         orderDTO.setUsers(domain.getUser().getId() != null ? domain.getId() : null);
         orderDTO.setProducts(domain.getProduct().getId() != null ? domain.getId() : null);
          return orderDTO;

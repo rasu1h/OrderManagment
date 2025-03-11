@@ -51,7 +51,8 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new EntityNotFoundException(String.valueOf(request.getProductId()) + " of Product not found"));
 
         validateOrderRequest(request, product);
-
+        BigDecimal totalPrice = product.getPrice().multiply(BigDecimal.valueOf(request.getQuantity()));
+        product.setQuantity(product.getQuantity() - request.getQuantity());
         Order newOrder = Order.builder()
                 .description(request.getDescription())
                 .quantity(request.getQuantity())
@@ -60,6 +61,7 @@ public class OrderServiceImpl implements OrderService {
                 .status(OrderStatus.PENDING)
                 .price(product.getPrice().multiply(BigDecimal.valueOf(request.getQuantity())).doubleValue())
                 .build();
+
 
         Order savedOrder = orderRepository.save(newOrder);
         productRepository.save(product);
@@ -179,8 +181,11 @@ public class OrderServiceImpl implements OrderService {
     boolean isUserOrder(Long orderId, User currentUser) {
         Order jpaOrder = orderRepository.findById(orderId).orElseThrow();
         log.debug("User in OrderJpaEntity: {}", jpaOrder.getUser().getName()); // Should not be null
-        return orderRepository.findById(orderId)
-                .map(order -> !Objects.equals(order.getUser().getId(), currentUser.getId()))
-                .orElseThrow(() -> new EntityNotFoundException("Order not found"));
+        Long id = orderRepository
+                .findById(orderId).get().getUser().getId();
+
+        return Objects.equals(id, currentUser.getId());
+
+
     }
 }

@@ -45,7 +45,12 @@ public class ProductRepositoryAdapter implements ProductRepositoryPort{
 
     @Override
     public void save(Product product) {
-        productRepository.save(productRepository.findById(product.getId()).get());
+        ProductJpaEntity productJpaEntity = productRepository.findById(product.getId()).get();
+        productJpaEntity.setName(product.getName());
+        productJpaEntity.setPrice(product.getPrice());
+        productJpaEntity.setQuantity(product.getQuantity());
+
+        productRepository.save(productJpaEntity);
     }
 
     @Override
