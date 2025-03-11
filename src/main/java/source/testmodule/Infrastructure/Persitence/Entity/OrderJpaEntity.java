@@ -1,4 +1,4 @@
-package source.testmodule.Domain.Entity;
+package source.testmodule.Infrastructure.Persitence.Entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -19,7 +19,7 @@ import source.testmodule.Domain.Enums.OrderStatus;
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Table(name = "orders")
-public class Order {
+public class OrderJpaEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -39,8 +39,8 @@ public class Order {
     @JoinColumn(name = "user_id")
     private UserJpaEntity userJpaEntity;
     @NonNull
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "product_id")
-    private Product product;
+    private ProductJpaEntity productJpaEntity;
 
 }

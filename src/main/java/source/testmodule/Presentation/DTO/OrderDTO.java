@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import source.testmodule.Domain.Entity.Order;
+import source.testmodule.Infrastructure.Persitence.Entity.OrderJpaEntity;
 import source.testmodule.Domain.Enums.OrderStatus;
 
 /**
@@ -29,18 +29,18 @@ public class OrderDTO {
 
     /**
      * Converts the entity to the DTO.
-     * @param order
+     * @param orderJpaEntity
      * @return
      */
-    public static OrderDTO fromEntity(Order order) {  // converting from entity to DTO response
+    public static OrderDTO fromEntity(OrderJpaEntity orderJpaEntity) {  // converting from entity to DTO response
         OrderDTO orderDTO = new OrderDTO();
-        orderDTO.setId(order.getId());
-        orderDTO.setDescription(order.getDescription());
-        orderDTO.setPrice(order.getPrice());
-        orderDTO.setStatus(order.getStatus());
-        orderDTO.setQuantity(order.getQuantity());
-        orderDTO.setUsers(order.getUser().getId());
-        orderDTO.setProducts(order.getProduct().getId());
+        orderDTO.setId(orderJpaEntity.getId());
+        orderDTO.setDescription(orderJpaEntity.getDescription());
+        orderDTO.setPrice(orderJpaEntity.getPrice());
+        orderDTO.setStatus(orderJpaEntity.getStatus());
+        orderDTO.setQuantity(orderJpaEntity.getQuantity());
+        orderDTO.setUsers(orderJpaEntity.getUserJpaEntity().getId());
+        orderDTO.setProducts(orderJpaEntity.getProductJpaEntity().getId());
         return orderDTO;
     }
 }

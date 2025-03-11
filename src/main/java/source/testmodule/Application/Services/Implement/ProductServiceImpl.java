@@ -4,22 +4,22 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import source.testmodule.Presentation.DTO.ProductDTO;
 import source.testmodule.Presentation.DTO.Requests.ProductRequest;
-import source.testmodule.Domain.Entity.Product;
-import source.testmodule.Infrastructure.Repository.ProductRepository;
+import source.testmodule.Infrastructure.Persitence.Entity.ProductJpaEntity;
+import source.testmodule.Infrastructure.Persitence.RepositoryAdapters.JpaRepository.JpaProductRepository;
 import source.testmodule.Application.Services.ProductService;
 
 @Service
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
-    private final ProductRepository productRepository;
+    private final JpaProductRepository jpaProductRepository;
 
     @Override
     public ProductDTO createProduct(ProductRequest productRequest) {
-        Product product = new Product();
-        product.setName(productRequest.getName());
-        product.setPrice(productRequest.getPrice());
-        product.setQuantity(productRequest.getQuantity());
-        productRepository.save(product);
-        return ProductDTO.fromEntity(product);
+        ProductJpaEntity productJpaEntity = new ProductJpaEntity();
+        productJpaEntity.setName(productRequest.getName());
+        productJpaEntity.setPrice(productRequest.getPrice());
+        productJpaEntity.setQuantity(productRequest.getQuantity());
+        jpaProductRepository.save(productJpaEntity);
+        return ProductDTO.fromEntity(productJpaEntity);
     }
 }

@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import source.testmodule.Domain.Entity.Product;
+import source.testmodule.Infrastructure.Persitence.Entity.ProductJpaEntity;
 
 /**
  * DTO class for the product.
@@ -21,15 +21,15 @@ public class ProductDTO {
 
     /**
      * Converts the entity to the DTO.
-     * @param product
+     * @param productJpaEntity
      * @return
      */
-    public static ProductDTO fromEntity(Product product) {
+    public static ProductDTO fromEntity(ProductJpaEntity productJpaEntity) {
         ProductDTO productDTO = new ProductDTO();
-        productDTO.setId(product.getId());
-        productDTO.setName(product.getName());
-        productDTO.setPrice(product.getPrice());
-        productDTO.setQuantity(product.getQuantity());
+        productDTO.setId(productJpaEntity.getId());
+        productDTO.setName(productJpaEntity.getName());
+        productDTO.setPrice(productJpaEntity.getPrice());
+        productDTO.setQuantity(productJpaEntity.getQuantity());
         return productDTO;
     }
 }

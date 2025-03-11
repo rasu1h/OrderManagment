@@ -4,6 +4,7 @@ import jakarta.annotation.Nullable;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
@@ -22,52 +23,23 @@ import source.testmodule.Infrastructure.Persitence.Entity.UserJpaEntity;
 import source.testmodule.Infrastructure.Persitence.Mappers.OrderMapper;
 import source.testmodule.Presentation.DTO.OrderDTO;
 import source.testmodule.Presentation.DTO.Requests.OrderRequest;
-import source.testmodule.Domain.Entity.Order;
-import source.testmodule.Domain.Entity.Product;
-import source.testmodule.Domain.Entity.User;
-import source.testmodule.Infrastructure.Repository.OrderRepository;
-import source.testmodule.Infrastructure.Repository.ProductRepository;
-import source.testmodule.Application.Services.OrderService;
+import source.testmodule.Domain.Enums.OrderStatus;
 
-import javax.naming.NoPermissionException;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Implementation of the OrderService interface.
- * Provides methods for managing orders.
- */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @CacheConfig(cacheNames = "ordersCache")
 public class OrderServiceImpl implements OrderService {
-    private final OrderRepository orderRepository;
-    private final ProductRepository productRepository;
+
+    private final OrderRepositoryPort orderRepository;
+    private final ProductRepositoryPort productRepository;
+    private final OrderMapper orderMapper;
     private final CacheManager cacheManager;
 
-    /**
-     * Checks if the order belongs to the current user.
-     *
-     * @param orderId the ID of the order
-     * @param currentUser the current user
-     * @return true if the order does not belong to the user, false otherwise
-     * @throws EntityNotFoundException if the order is not found
-     */
-    boolean isUserOrder(Long orderId, User currentUser) {
-        return orderRepository.findById(orderId)
-                .map(order -> !Objects.equals(order.getUser().getId(), currentUser.getId()))
-                .orElseThrow(() -> new EntityNotFoundException("Order not found"));
-    }
 
-    /**
-     * Creates a new order.
-     *
-     * @param orderRequest the order request containing order details
-     * @param currentUser the current user making the request
-     * @return the created order
-     * @throws RuntimeException if the product is not found or there is not enough quantity
-     * @throws IllegalArgumentException if the quantity is less than or equal to 0 or the description is too long
-     */
     @Override
     @Transactional
     @Caching(evict = {
@@ -81,12 +53,22 @@ public class OrderServiceImpl implements OrderService {
 
         validateOrderRequest(request, product);
 
-        orderRepository.save(order);
+        Order newOrder = Order.builder()
+                .description(request.getDescription())
+                .quantity(request.getQuantity())
+                .product(product)
+                .user(currentUser)
+                .status(OrderStatus.PENDING)
+                .price(product.getPrice() * request.getQuantity())
+                .build();
+
+        Order savedOrder = orderRepository.save(newOrder);
         productRepository.save(product);
-        return OrderDTO.fromEntity(order);
+
+        return orderMapper.toDTO(savedOrder);
     }
 
-    /**
+        /**
      * Updates an existing order.
      *
      * @param orderId the ID of the order to update
@@ -103,11 +85,32 @@ public class OrderServiceImpl implements OrderService {
         }
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new EntityNotFoundException("Order not found"));
+
         order.setQuantity(request.getQuantity());
         order.setDescription(request.getDescription());
         order.setStatus(request.getStatus());
         order.setPrice(order.getProduct().getPrice() * request.getQuantity());
-        return OrderDTO.fromEntity(orderRepository.save(order));
+        orderRepository.save(order);
+        return orderMapper.toDTO(order);
+    }
+
+    /**
+     * Validates the order request.
+     * @param request
+     * @param product
+     */
+    private void validateOrderRequest(OrderRequest request, Product product) {
+        if (request.getQuantity() <= 0) {
+            throw new IllegalArgumentException(request.getQuantity() + " is less than or equal to 0");
+        }
+
+        if (request.getDescription().length() > 255) {
+            throw new IllegalArgumentException(request.getDescription() + " is too long");
+        }
+
+        if (product.getQuantity() < request.getQuantity()) {
+            throw new IllegalArgumentException(product.getId() + " Not enough quantity");
+        }
     }
 
     /**
@@ -124,8 +127,9 @@ public class OrderServiceImpl implements OrderService {
         }
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new EntityNotFoundException("Order not found"));
-        return OrderDTO.fromEntity(order);
+        return orderMapper.toDTO(order);
     }
+
 
     /**
      * Retrieves a list of orders based on filters.
@@ -143,19 +147,9 @@ public class OrderServiceImpl implements OrderService {
             @Nullable Double maxPrice
     ) {
         validatePriceRange(minPrice, maxPrice);
-        return orderRepository.findFilteredOrders(status, minPrice, maxPrice)
-                .stream()
-                .map(OrderDTO::fromEntity)
-                .toList();
+        return orderRepository.findFilteredOrders(status, minPrice, maxPrice);
     }
 
-    /**
-     * Validates the price range.
-     *
-     * @param min the minimum price
-     * @param max the maximum price
-     * @throws IllegalArgumentException if the minimum price is greater than the maximum price
-     */
     public void validatePriceRange(Double min, Double max) {
         if (min != null && max != null && min > max) {
             throw new IllegalArgumentException("Invalid price range");
@@ -173,5 +167,21 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new EntityNotFoundException("Order not found"));
         orderRepository.delete(order);
+    }
+
+        /**
+     * Checks if the order belongs to the current user.
+     *
+     * @param orderId the ID of the order
+     * @param currentUser the current user
+     * @return true if the order does not belong to the user, false otherwise
+     * @throws EntityNotFoundException if the order is not found
+     */
+    boolean isUserOrder(Long orderId, User currentUser) {
+        Order jpaOrder = orderRepository.findById(orderId).orElseThrow();
+        log.debug("UserJpaEntity in OrderJpaEntity: {}", jpaOrder.getUser()); // Should not be null
+        return orderRepository.findById(orderId)
+                .map(order -> !Objects.equals(order.getUser().getId(), currentUser.getId()))
+                .orElseThrow(() -> new EntityNotFoundException("Order not found"));
     }
 }

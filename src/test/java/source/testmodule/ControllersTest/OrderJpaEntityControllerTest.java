@@ -1,39 +1,31 @@
 package source.testmodule.ControllersTest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Before;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.*;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 import source.testmodule.Application.Services.OrderService;
 import source.testmodule.Application.Services.UserService;
-import source.testmodule.Domain.Entity.User;
+import source.testmodule.Domain.Model.User;
+import source.testmodule.Domain.Repository.UserRepositoryPort;
+import source.testmodule.Infrastructure.Configurations.WebConfig;
+import source.testmodule.Infrastructure.Persitence.Entity.UserJpaEntity;
 import source.testmodule.Domain.Enums.OrderStatus;
-import source.testmodule.Domain.Enums.UserRole;
 import source.testmodule.Infrastructure.Configurations.Jwt.JwtAuthFilter;
 import source.testmodule.Infrastructure.Configurations.Jwt.JwtTokenProvider;
 import source.testmodule.Infrastructure.Configurations.Security.SecurityConfig;
-import source.testmodule.Infrastructure.Configurations.WebConfig;
-import source.testmodule.Infrastructure.Repository.UserRepository;
+import source.testmodule.Infrastructure.Persitence.RepositoryAdapters.JpaRepository.JpaUserRepository;
 import source.testmodule.Presentation.Controllers.OrderController;
 import source.testmodule.Presentation.DTO.OrderDTO;
 import source.testmodule.Presentation.DTO.Requests.OrderRequest;
-import source.testmodule.TestModuleApplication;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -50,9 +42,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import({
         SecurityConfig.class,
         JwtTokenProvider.class,
-        OrderControllerTest.TestConfig.class
+        OrderJpaEntityControllerTest.TestConfig.class,
+        WebConfig.class
 })
-public class OrderControllerTest {
+public class OrderJpaEntityControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -200,9 +193,11 @@ public class OrderControllerTest {
         updateRequest.setQuantity(3);
         updateRequest.setDescription("Updated Order");
         updateRequest.setProductId(1L);
+        updateRequest.setStatus(OrderStatus.PENDING);
 
         OrderDTO updatedOrderDTO = new OrderDTO();
         updatedOrderDTO.setId(orderId);
+        updatedOrderDTO.setStatus(OrderStatus.CONFIRMED);
         updatedOrderDTO.setDescription("Updated Order");
         updatedOrderDTO.setQuantity(3);
         updatedOrderDTO.setProducts(1L);
@@ -215,6 +210,10 @@ public class OrderControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateRequest)))
                 .andDo(print())
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.description").value("Updated Order"))
+                .andExpect(jsonPath("$.quantity").value(3))
+                .andExpect(jsonPath("$.status").value("CONFIRMED"))
+                .andExpect(jsonPath("$.products").value(1L));
     }
 }
