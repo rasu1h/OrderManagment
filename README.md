@@ -9,6 +9,7 @@
 ### Предварительные условия
 - Установите [Docker](https://www.docker.com/get-started)
 - Установите [Docker Compose](https://docs.docker.com/compose/install/)
+-   **Важно для Windows:** Если вы используете Windows, обязательно установите [Docker Desktop](https://www.docker.com/products/docker-desktop), так как без него Docker Engine не будет запущен.
 
 ### Клонирование и запуск проекта
 
